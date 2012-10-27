@@ -7,11 +7,15 @@ html(lang="en")
   body
     #content
       a(href='https://github.com/alvaro-cuesta/woodstock')
-        img(src='/img/logo.png', alt='SocketStream Logo', width=160, height=160)
-      #game GAME
-        form#nickForm(onsubmit='return false')
-          input(id='nick', type='text')
-      #chat CHAT
+        img(src='/img/logo.png', alt='Woodstock Logo', width=160, height=160)
+      #login
+        form.form-inline#loginForm(onsubmit='return false')
+          legend Login or register
+          div.input-append
+            input(id='nick', class='input-small', type='text', value="Nick")
+            input(id='pass', class='input-small', type='password', value="Pass")
+            button(type='submit', class="btn") Submit
+      #chat
         form#chatForm(onsubmit='return false')
           #chatlog
           input(id='message', type='text', autocomplete='off')

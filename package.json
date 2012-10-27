@@ -11,6 +11,7 @@
     "ss-jade": "0.1.x",
     "ss-stylus": "0.1.x",
     "ss-hogan": "0.1.x",
-    "ss-console": "0.1.x"
+    "ss-console": "0.1.x",
+    "mongodb": "*"
   }
 }

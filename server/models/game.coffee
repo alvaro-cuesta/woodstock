@@ -5,7 +5,7 @@ rand = (min, max) ->
   min + Math.floor Math.random() * max
 
 ## Base Game model (and a bit of controller hehe)
-class GameModel
+class Game
   constructor: (@width, @height, mines, @gameDuration, @turnDuration, @players) ->
     # <0   - mine
     # >=0  - # of surrounding mines

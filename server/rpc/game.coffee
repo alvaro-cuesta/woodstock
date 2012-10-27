@@ -3,7 +3,7 @@
 
 exports.actions = (req, res, ss) ->
   req.use('session')
-  req.use('authentication')
+  req.use('authentication.check')
 
   uncover: (game, x, y) ->
     if game.players[game.turn] == req.session.userId
