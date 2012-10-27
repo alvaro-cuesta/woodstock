@@ -3,16 +3,15 @@ html(lang="en")
   head
     meta(charset="utf-8")
     != SocketStream
-    title Welcome
+    title Woodstock
   body
     #content
-      a(href='https://github.com/socketstream/socketstream')
-        img(src='/images/logo.png', alt='SocketStream Logo', width=160, height=160)
-      h1 Welcome to your new realtime app!
-      
-      // QUICK CHAT DEMO
-      form#demo(onsubmit='return false')
-        h3 Quick Chat Demo
-        h5 Open this page in multiple tabs or browsers and type a message below
-        #chatlog
-        input(id='myMessage', type='text', autocomplete='off')
+      a(href='https://github.com/alvaro-cuesta/woodstock')
+        img(src='/img/logo.png', alt='SocketStream Logo', width=160, height=160)
+      #game GAME
+        form#nickForm(onsubmit='return false')
+          input(id='nick', type='text')
+      #chat CHAT
+        form#chatForm(onsubmit='return false')
+          #chatlog
+          input(id='message', type='text', autocomplete='off')
