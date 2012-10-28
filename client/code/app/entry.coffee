@@ -27,6 +27,7 @@ ss.server.on 'disconnect', ->
     .text('Not connected')
 
 ss.server.on 'reconnect', ->
+  ss.rpc('game.getStats')
   $('#game-status')
     .addClass('connected')
     .removeClass('not-connected')
@@ -34,6 +35,7 @@ ss.server.on 'reconnect', ->
 
 ss.server.on 'ready', ->
   jQuery ->
+    ss.rpc('game.getStats')
     $('#game-status')
       .addClass('connected')
       .removeClass('not-connected')
@@ -94,6 +96,9 @@ ss.event.on 'endGame', (playerId, game) ->
   $board.html ''
   board.appendTo $board
 
+  $('#player-points').text game.scores[playerId]
+  $('#oponent-points').text game.scores[(playerId + 1) % 2]
+
   if game.scores[playerId] > game.scores[(playerId + 1) % 2]
     $('#turn-title')
       .addClass('your-turn')
@@ -127,6 +132,11 @@ ss.event.on 'notYourTurn', (gameId) ->
     .removeClass('your-turn')
     .addClass('opponent-turn')
     .text("Opponent's turn")
+
+ss.event.on 'stats', (stats) ->
+  $('#games-in-progress').text(stats.inProgress)
+  $('#games-played').text(stats.played)
+  $('#marijuana-found').text(stats.found)
 
 module.exports.looper = ->
   canvas.update();

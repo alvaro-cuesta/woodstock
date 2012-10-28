@@ -12,8 +12,13 @@ TURN_SECONDS = 10
 games = []
 waiting = null
 
-gameCount = 0
-found = 0
+stats =
+  played: 0
+  inProgress: 0
+  found: 0
+
+sendStats = (ss) ->
+  ss.publish.all 'stats', stats
 
 notifyTurn = (game, ss) ->
   for player in game.players
@@ -39,6 +44,8 @@ endGame = (game, ss) ->
   for player, index in game.players
     ss.publish.socketId player, 'endGame', index, game
     delete games[game.id]
+  stats.inProgress -= 1
+  sendStats(ss)
 
 cleanGame = (game) ->
   id: game.id
@@ -64,6 +71,10 @@ exports.actions = (req, res, ss) ->
         GAME_SECONDS, TURN_SECONDS, [waiting, player]
 
       games[gameId] = game
+
+      stats.played += 1
+      stats.inProgress += 1
+      sendStats(ss)
 
       ss.publish.socketId player, 'newGame', cleanGame(game)
       ss.publish.socketId waiting, 'newGame', cleanGame(game)
@@ -103,6 +114,8 @@ exports.actions = (req, res, ss) ->
     console.log game.state
     game.uncover(x, y)
     if game.state[x][y] < 0  # There is a mine
+      stats.found += 1
+      sendStats(ss)
       game.scores[game.turn] += 1
       totalMines = game.scores.reduce (t, s) -> t + s
       if totalMines == game.mines
@@ -117,3 +130,7 @@ exports.actions = (req, res, ss) ->
       ss.publish.socketId player, 'updatedGame', index, cleanGame(game)
 
     res true
+
+  getStats: ->
+    ss.publish.socketId req.socketId, 'stats', stats
+    res trye
