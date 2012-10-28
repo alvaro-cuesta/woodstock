@@ -12,6 +12,9 @@ TURN_SECONDS = 10
 games = []
 waiting = null
 
+gameCount = 0
+found = 0
+
 notifyTurn = (game, ss) ->
   for player in game.players
     if game.players[game.turn] == player
@@ -28,13 +31,13 @@ newTurnTimeout = (game, ss) ->
     notifyTurn(game, ss)
   , TURN_SECONDS * 1000
 
-endGame = (game) ->
+endGame = (game, ss) ->
   if game.globalTimeout
     clearTimeout game.globalTimeout
   if game.turnTimeout
     clearTimeout game.turnTimeout
-  for player in game.players
-    ss.publish.socketId player, 'endGame', game.id
+  for player, index in game.players
+    ss.publish.socketId player, 'endGame', index, game
     delete games[game.id]
 
 cleanGame = (game) ->
@@ -66,7 +69,9 @@ exports.actions = (req, res, ss) ->
       ss.publish.socketId waiting, 'newGame', cleanGame(game)
       ss.publish.socketId game.players[game.turn], 'yourTurn', gameId
 
-      game.globalTimeout = setTimeout endGame, GAME_SECONDS * 1000
+      game.globalTimeout = setTimeout ->
+        endGame(game, ss)
+      , GAME_SECONDS * 1000
       newTurnTimeout(game, ss)
       notifyTurn(game, ss)
 
@@ -99,6 +104,10 @@ exports.actions = (req, res, ss) ->
     game.uncover(x, y)
     if game.state[x][y] < 0  # There is a mine
       game.scores[game.turn] += 1
+      totalMines = game.scores.reduce (t, s) -> t + s
+      if totalMines == game.mines
+        endGame(game, ss)
+        return
     else
       game.turn = (game.turn + 1) % game.players.length
       notifyTurn(game, ss)
