@@ -14,7 +14,7 @@ waiting = null
 
 notifyTurn = (game, ss) ->
   for player in game.players
-    if game.players[game.turn] = player
+    if game.players[game.turn] == player
       ss.publish.socketId player, 'yourTurn', cleanGame(game)
     else
       ss.publish.socketId player, 'notYourTurn', cleanGame(game)
