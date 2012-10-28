@@ -56,6 +56,11 @@ ss.server.on 'ready', ->
 
     player_is_high = false;
 
+newGameText = 'New game'
+ss.event.on 'waiting', (waiting) ->
+  newGameText = if waiting then 'Join waiting player' else 'New game'
+  $('#newGame').text newGameText
+
 ss.event.on 'newGame', (game) ->
   console.log "Starting game #{game.id}"
   console.log game
@@ -113,7 +118,7 @@ ss.event.on 'endGame', (playerId, game) ->
   $('#newGame')
     .show()
     .attr('disabled', false)
-    .text('New game')
+    .text(newGameText)
 
 ss.event.on 'yourTurn', (gameId) ->
   console.log "Your turn in game #{gameId}"

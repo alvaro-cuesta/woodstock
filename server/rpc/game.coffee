@@ -76,6 +76,7 @@ exports.actions = (req, res, ss) ->
       stats.inProgress += 1
       sendStats(ss)
 
+      ss.publish.all 'waiting', false
       ss.publish.socketId player, 'newGame', cleanGame(game)
       ss.publish.socketId waiting, 'newGame', cleanGame(game)
       ss.publish.socketId game.players[game.turn], 'yourTurn', gameId
@@ -89,6 +90,7 @@ exports.actions = (req, res, ss) ->
       waiting = null
       res true
     else
+      ss.publish.all 'waiting', true
       waiting = player
       res false
 
@@ -133,4 +135,5 @@ exports.actions = (req, res, ss) ->
 
   getStats: ->
     ss.publish.socketId req.socketId, 'stats', stats
-    res trye
+    ss.publish.socketId req.socketId, 'waiting', waiting
+    res true
