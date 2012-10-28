@@ -41,15 +41,11 @@
 	background-color: rgba(0, 0, 0, @header-background-opacity);
 	border-radius: 0px 0px @header-border-radius @header-border-radius;
 
-	#game-status {
+	#game-status.connected {
+		color: #0f0;
+	}
 
-		.connected {
-			color: #0f0;
-		}
-
-		.not-connected {
-			color: #f00;
-		}
-
+	#game-status.not-connected {
+		color: #f00;
 	}
 }
