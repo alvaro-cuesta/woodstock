@@ -41,9 +41,40 @@ ss.server.on 'ready', ->
     canvas.draw()
     gradation.draw(canvas)
 
-    board = new Board 0, BOARD_WIDTH, BOARD_HEIGHT
-    board.appendTo $('#board')
     player_is_high = false;
+
+ss.event.on 'newGame', (game) ->
+  console.log "Starting game #{game.id}"
+  console.log game
+
+  $board = $('#board')
+  board = new Board game.id, game.width, game.height
+  $board.html ''
+  board.appendTo $board
+
+ss.event.on 'updatedGame', (game) ->
+  console.log "Updated game #{game.id}"
+  console.log game
+
+  $board = $('#board')
+  board = new Board game.id, game.width, game.height
+  for x in [0..(game.width-1)]
+    for y in [0..(game.height-1)]
+      board.tiles[x][y].set game.state[x][y]
+  $board.html ''
+  board.appendTo $board
+
+ss.event.on 'endGame', (game) ->
+  console.log "Finished game #{game.id}"
+  console.log game
+
+ss.event.on 'yourTurn', (game) ->
+  console.log "Your turn in game #{game.id}"
+  console.log game
+
+ss.event.on 'notYourTurn', (game) ->
+  console.log "Not your turn in game #{game.id}"
+  console.log game
 
 module.exports.looper = ->
   canvas.update();

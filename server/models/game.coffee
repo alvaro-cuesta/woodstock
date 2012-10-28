@@ -6,7 +6,7 @@ rand = (min, max) ->
 
 ## Base Game model (and a bit of controller hehe)
 class Game
-  constructor: (@width, @height, @mines, @gameDuration, @turnDuration, @players, @turnCallback, @endCallback) ->
+  constructor: (@id, @width, @height, @mines, @gameDuration, @turnDuration, @players) ->
     # <0   - mine
     # >=0  - # of surrounding mines
     @board = ((0 for y in [0..(@height-1)]) for x in [0..(@width-1)])
@@ -29,15 +29,6 @@ class Game
 
     @turn = rand(@players.length) # Random turn
 
-    # Set end-game timeout
-    @globalTimeout = setTimeout =>
-      clearTimeout @turnTimeout
-      @endCallback this
-    , @gameDuration * 1000
-
-    # Set turn timeout
-    @resetTurnTimeout()
-
     # Set player scores
     @scores = (0 for x in players)
 
@@ -49,12 +40,5 @@ class Game
         for j in [-1..1]
           if (0 <= x+i < @width) and (0 <= y+j < @height) and (@state[x+i][y+j] == false)
             @uncover x+i, y+j
-
-  resetTurnTimeout: ->
-    clearTimeout @turnTimeout
-    @turnTimeout = setTimeout =>
-      clearTimeout @globalTimeout
-      @turnCallback this
-    , @turnDuration * 1000
 
 module.exports = Game
