@@ -54,6 +54,7 @@ ss.event.on 'newGame', (game) ->
 
   $('#player-points').text '0'
   $('#oponent-points').text '0'
+  $('#newGame').hide()
 
 ss.event.on 'updatedGame', (playerId, game) ->
   console.log "Updated game #{game.id}. You are player #{playerId}."
@@ -73,6 +74,8 @@ ss.event.on 'updatedGame', (playerId, game) ->
 ss.event.on 'endGame', (gameId) ->
   console.log "Finished game #{gameId}"
   console.log game
+
+  $(this).attr("disabled", false).text('New game')
 
 ss.event.on 'yourTurn', (gameId) ->
   console.log "Your turn in game #{gameId}"

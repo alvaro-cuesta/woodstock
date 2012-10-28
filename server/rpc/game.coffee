@@ -89,11 +89,12 @@ exports.actions = (req, res, ss) ->
 
     if 0 <= x < game.width and 0 <= y < game.height
       game.uncover x, y
+      tile = game.state[x][y]
 
-      if game.state[x][y] < 0  # There is a mine
-        game.scores[game.turn] += 1
-      else
+      if tile == false  # Covered tile
         game.turn = (game.turn + 1) % game.players.length
+      else if tile < 0  # There is a mine
+        game.scores[game.turn] += 1
 
       newTurnTimeout(game, ss)
       for player, index in game.players
