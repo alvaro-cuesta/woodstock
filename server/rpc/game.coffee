@@ -13,7 +13,7 @@ games = []
 waiting = null
 
 epoch = ->
-  +new Date / 1000
+  parseInt(+new Date / 1000)
 
 stats =
   played: 0
@@ -25,7 +25,7 @@ sendStats = (ss) ->
 
 changeTurn = (game, ss) ->
   game.turn = (game.turn + 1) % game.players.length
-  game.endTurn = parseInt(epoch() + TURN_SECONDS)
+  game.endTurn = epoch() + TURN_SECONDS
 
   for player in game.players
     if game.players[game.turn] == player
@@ -76,7 +76,7 @@ exports.actions = (req, res, ss) ->
       gameId++ while games[gameId]
 
       game = new Game gameId, BOARD_WIDTH, BOARD_HEIGHT, BOARD_MINES,
-        parseInt(epoch() + GAME_SECONDS), parseInt(epoch() + TURN_SECONDS), [waiting, player]
+        epoch() + GAME_SECONDS, epoch() + TURN_SECONDS, [waiting, player]
 
       games[gameId] = game
 

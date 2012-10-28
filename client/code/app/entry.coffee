@@ -62,13 +62,17 @@ ss.event.on 'waiting', (waiting) ->
   $('#newGame').text newGameText
 
 timeIntervalGlobal = null
+timeIntervalTurn = null
 epoch = ->
-  +new Date / 1000
+  parseInt(+new Date / 1000)
 pad2 = (number) ->
   (if number < 10 then '0' else '') + number
 
 updateTurnInterval = (game) ->
-  console.log game.endTurn
+  if timeIntervalTurn
+    clearInterval timeIntervalTurn
+    timeIntervalTurn = null
+
   remainingTurn = game.endTurn - epoch()
   $('#turn-time').text("#{pad2(parseInt(remainingTurn / 60))}:#{pad2(parseInt(remainingTurn % 60))}")
   timeIntervalTurn = setInterval ->
