@@ -6,8 +6,8 @@ BOARD_WIDTH = 27
 BOARD_HEIGHT = 17
 BOARD_MINES = 10
 
-GAME_SECONDS = 300
-TURN_SECONDS = 10
+GAME_SECONDS = 30
+TURN_SECONDS = 3
 
 games = []
 waiting = null
@@ -32,7 +32,7 @@ newTurnTimeout = (game, ss) ->
     clearTimeout game.turnTimeout
 
   game.turnTimeout = setTimeout ->
-    clearTimeout game.globalTimeout
+    newTurnTimeout(game, ss)
     notifyTurn(game, ss)
   , TURN_SECONDS * 1000
 
@@ -47,6 +47,9 @@ endGame = (game, ss) ->
   stats.inProgress -= 1
   sendStats(ss)
 
+epoch = ->
+  +new Date / 1000
+
 cleanGame = (game) ->
   id: game.id
   width: game.width
@@ -58,6 +61,7 @@ cleanGame = (game) ->
   state: game.state
   turn: game.turn
   scores: game.scores
+  endEpoch: game.endEpoch
 
 exports.actions = (req, res, ss) ->
   new: ->
@@ -68,7 +72,7 @@ exports.actions = (req, res, ss) ->
       gameId++ while games[gameId]
 
       game = new Game gameId, BOARD_WIDTH, BOARD_HEIGHT, BOARD_MINES,
-        GAME_SECONDS, TURN_SECONDS, [waiting, player]
+        epoch() + GAME_SECONDS, TURN_SECONDS, [waiting, player]
 
       games[gameId] = game
 

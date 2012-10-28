@@ -61,6 +61,12 @@ ss.event.on 'waiting', (waiting) ->
   newGameText = if waiting then 'Join waiting player' else 'New game'
   $('#newGame').text newGameText
 
+timeInterval = null
+epoch = ->
+  +new Date / 1000
+pad2 = (number) ->
+  (if number < 10 then '0' else '') + number
+
 ss.event.on 'newGame', (game) ->
   console.log "Starting game #{game.id}"
   console.log game
@@ -73,6 +79,14 @@ ss.event.on 'newGame', (game) ->
   $('#player-points').text '0'
   $('#oponent-points').text '0'
   $('#newGame').hide()
+
+  remaining = game.endEpoch - epoch()
+  $('#game-time').text("#{pad2(parseInt(remaining / 60))}:#{pad2(parseInt(remaining % 60))}")
+
+  timeInterval = setInterval ->
+    remaining = game.endEpoch - epoch()
+    $('#game-time').text("#{pad2(parseInt(remaining / 60))}:#{pad2(parseInt(remaining % 60))}")
+  , 1000
 
 ss.event.on 'updatedGame', (playerId, game) ->
   console.log "Updated game #{game.id}. You are player #{playerId}."
@@ -100,6 +114,9 @@ ss.event.on 'endGame', (playerId, game) ->
       board.tiles[x][y].set game.state[x][y]
   $board.html ''
   board.appendTo $board
+
+  clearInterval timeInterval
+  timeInterval = null
 
   $('#player-points').text game.scores[playerId]
   $('#oponent-points').text game.scores[(playerId + 1) % 2]

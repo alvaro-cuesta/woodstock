@@ -6,7 +6,7 @@ rand = (min, max) ->
 
 ## Base Game model (and a bit of controller hehe)
 class Game
-  constructor: (@id, @width, @height, @mines, @gameDuration, @turnDuration, @players) ->
+  constructor: (@id, @width, @height, @mines, @endEpoch, @turnDuration, @players) ->
     # <0   - mine
     # >=0  - # of surrounding mines
     @board = ((0 for y in [0..(@height-1)]) for x in [0..(@width-1)])
