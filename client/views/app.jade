@@ -1,21 +1,41 @@
 !!! 5
-html(lang="en")
-  head
-    meta(charset="utf-8")
-    != SocketStream
-    title Woodstock
-  body
-    #content
-      a(href='https://github.com/alvaro-cuesta/woodstock')
-        img(src='/img/logo.png', alt='Woodstock Logo', width=160, height=160)
-      #login
-        form.form-inline#loginForm(onsubmit='return false')
-          legend Login or register
-          div.input-append
-            input(id='nick', class='input-small', type='text', value="Nick")
-            input(id='pass', class='input-small', type='password', value="Pass")
-            button(type='submit', class="btn") Submit
-      #chat
-        form#chatForm(onsubmit='return false')
-          #chatlog
-          input(id='message', type='text', autocomplete='off')
+//if lt IE 7
+  !{'<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en">'}
+//if IE 7
+  !{'<html class="no-js lt-ie9 lt-ie8" lang="en">'}
+//if IE 8
+  !{'<html class="no-js lt-ie9" lang="en">'}
+//if gt IE 8
+  !{'<html class="no-js" lang="en">'}
+head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width')
+  != SocketStream
+  title Buscannabis
+  //if lt IE 9
+    script(src='http://html5shiv.googlecode.com/svn/trunk/html5.js')
+body
+  a(name='top')
+  canvas#c(width='5', height='5')
+  .row
+    #header.twelve.columns
+      ul
+        li
+          a(href='#top') Play
+        li
+          a(href='#hall-of-fame') Hall of fame
+        li
+          a(href='#help-and-credits') Help &amp; credits
+        li
+          a#newGame.radius.success.button New game
+  .row
+    #game.twelve.columns
+      .row
+        #board.eight.columns
+        .four.columns.sidebar
+          h2 List of games / Chat
+  .row
+    #subheader.twelve.columns
+      strong Network status: 
+      | Not connected
+!{'</html>'}

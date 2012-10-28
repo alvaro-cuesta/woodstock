@@ -6,7 +6,7 @@ rand = (min, max) ->
 
 ## Base Game model (and a bit of controller hehe)
 class Game
-  constructor: (@width, @height, mines, @gameDuration, @turnDuration, @players) ->
+  constructor: (@width, @height, @mines, @gameDuration, @turnDuration, @players, @turnCallback, @endCallback) ->
     # <0   - mine
     # >=0  - # of surrounding mines
     @board = ((0 for y in [0..(@height-1)]) for x in [0..(@width-1)])
@@ -14,10 +14,10 @@ class Game
     @state = ((false for y in [0..(@height-1)]) for x in [0..(@width-1)])
 
     # Drop random mines
-    for k in [1..mines]
+    for k in [1..@mines]
       loop  # Search for an empty spot
-        x = rand(@width)
-        y = rand(@height)
+        x = rand(0, @width)
+        y = rand(0, @height)
         break if @board[x][y] >= 0
 
       # Mark adjacency matrix
@@ -31,12 +31,12 @@ class Game
 
     # Set end-game timeout
     @globalTimeout = setTimeout =>
-      removeTimeout @turnTimeout
-      ss.publish.all 'gameEnd', this
+      clearTimeout @turnTimeout
+      @endCallback this
     , @gameDuration * 1000
 
     # Set turn timeout
-    @resetTimeout()
+    @resetTurnTimeout()
 
     # Set player scores
     @scores = (0 for x in players)
@@ -50,12 +50,11 @@ class Game
           if (0 <= x+i < @width) and (0 <= y+j < @height) and (@state[x+i][y+j] == false)
             @uncover x+i, y+j
 
-  resetTimeout: ->
-    removeTimeout @turnTimeout
+  resetTurnTimeout: ->
+    clearTimeout @turnTimeout
     @turnTimeout = setTimeout =>
-      removeTimeout @globalTimeout
-      ss.publish.all 'timeOut', this
+      clearTimeout @globalTimeout
+      @turnCallback this
     , @turnDuration * 1000
-    ss.publish.all 'updatedGame', this
 
 module.exports = Game
