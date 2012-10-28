@@ -75,15 +75,28 @@ ss.event.on 'endGame', (gameId) ->
   console.log "Finished game #{gameId}"
   console.log game
 
-  $(this).attr("disabled", false).text('New game')
+  $ '#newGame'
+    .show()
+    .attr 'disabled', false
+    .text 'New game'
 
 ss.event.on 'yourTurn', (gameId) ->
   console.log "Your turn in game #{gameId}"
   console.log game
 
+  $('#turn-title')
+    .addClass('your-turn')
+    .removeClass('opponent-turn')
+    .text('Your turn')
+
 ss.event.on 'notYourTurn', (gameId) ->
   console.log "Not your turn in game #{gameId}"
   console.log game
+
+  $('#turn-title')
+    .removeClass('your-turn')
+    .addClass('opponent-turn')
+    .text("Opponent's turn")
 
 module.exports.looper = ->
   canvas.update();

@@ -87,22 +87,24 @@ exports.actions = (req, res, ss) ->
       res false
       return
 
-    if 0 <= x < game.width and 0 <= y < game.height
-      game.uncover x, y
-      tile = game.state[x][y]
-
-      if tile == false  # Covered tile
-        game.turn = (game.turn + 1) % game.players.length
-      else if tile < 0  # There is a mine
-        game.scores[game.turn] += 1
-
-      newTurnTimeout(game, ss)
-      for player, index in game.players
-        ss.publish.socketId player, 'updatedGame', index, cleanGame(game)
- 
-      console.log game.turn
-
-      res true
-    else
+    if not (0 <= x < game.width and 0 <= y < game.height)
       res false
+      return
 
+    if game.state[x][y] != false
+      res false
+      return
+
+    console.log game.state
+    game.uncover(x, y)
+    if game.state[x][y] < 0  # There is a mine
+      game.scores[game.turn] += 1
+    else
+      game.turn = (game.turn + 1) % game.players.length
+      notifyTurn(game, ss)
+
+    newTurnTimeout(game, ss)
+    for player, index in game.players
+      ss.publish.socketId player, 'updatedGame', index, cleanGame(game)
+
+    res true
