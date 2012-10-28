@@ -27,7 +27,7 @@ class Game
             @board[x+i][y+j] += 1
       @board[x][y] = -mines  # ...and mark the spot as a mine (<0)
 
-    @turn = rand(@players.length) # Random turn
+    @turn = rand(0, @players.length) # Random turn
 
     # Set player scores
     @scores = (0 for x in players)

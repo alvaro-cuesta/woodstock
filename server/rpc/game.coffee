@@ -1,3 +1,5 @@
+# Better time handling
+
 Game = require '../models/game'
 
 BOARD_WIDTH = 27
@@ -96,6 +98,8 @@ exports.actions = (req, res, ss) ->
       newTurnTimeout(game, ss)
       for player in game.players
         ss.publish.socketId player, 'updatedGame', cleanGame(game)
+ 
+      console.log game.turn
 
       res true
     else
