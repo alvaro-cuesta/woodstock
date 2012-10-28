@@ -47,6 +47,7 @@ ss.server.on 'ready', ->
           $(this).fadeOut();
         else
           $(this).attr("disabled", true).text('Waiting for player...')
+          $(this).unbind('click')
 
     canvas = new Canvas
     gradation = new Gradation
@@ -58,8 +59,9 @@ ss.server.on 'ready', ->
 
 newGameText = 'New game'
 ss.event.on 'waiting', (waiting) ->
+  $newGame = $('#newGame')
   newGameText = if waiting then 'Join waiting player' else 'New game'
-  $('#newGame').text newGameText
+  $newGame.text(newGameText)
 
 timeIntervalGlobal = null
 timeIntervalTurn = null
@@ -68,16 +70,19 @@ epoch = ->
 pad2 = (number) ->
   (if number < 10 then '0' else '') + number
 
+drawTime = (remaining) ->
+  "#{pad2(parseInt(remaining / 60))}:#{pad2(parseInt(remaining % 60))}"
+
 updateTurnInterval = (game) ->
   if timeIntervalTurn
     clearInterval timeIntervalTurn
     timeIntervalTurn = null
 
   remainingTurn = game.endTurn - epoch()
-  $('#turn-time').text("#{pad2(parseInt(remainingTurn / 60))}:#{pad2(parseInt(remainingTurn % 60))}")
+  $('#turn-time').text(drawTime(remainingTurn))
   timeIntervalTurn = setInterval ->
     remainingTurn = game.endTurn - epoch()
-    $('#turn-time').text("#{pad2(parseInt(remainingTurn / 60))}:#{pad2(parseInt(remainingTurn % 60))}")
+    $('#turn-time').text(drawTime(remainingTurn))
   , 1000
 
 ss.event.on 'newGame', (game) ->
@@ -94,10 +99,10 @@ ss.event.on 'newGame', (game) ->
   $('#newGame').hide()
 
   remainingGlobal = game.endEpoch - epoch()
-  $('#game-time').text("#{pad2(parseInt(remainingGlobal / 60))}:#{pad2(parseInt(remainingGlobal % 60))}")
+  $('#game-time').text(drawTime(remainingGlobal))
   timeIntervalGlobal = setInterval ->
     remainingGlobal = game.endEpoch - epoch()
-    $('#game-time').text("#{pad2(parseInt(remainingGlobal / 60))}:#{pad2(parseInt(remainingGlobal % 60))}")
+    $('#game-time').text(drawTime(remainingGlobal))
   , 1000
 
   updateTurnInterval(game)
@@ -136,6 +141,11 @@ ss.event.on 'endGame', (playerId, game) ->
   timeIntervalGlobal = null
   timeIntervalTurn = null
 
+  remainingGlobal = game.endEpoch - epoch()
+  $('#game-time').text(drawTime(remainingGlobal))
+  remainingTurn = game.endTurn - epoch()
+  $('#turn-time').text(drawTime(remainingTurn))
+
   $('#player-points').text game.scores[playerId]
   $('#oponent-points').text game.scores[(playerId + 1) % 2]
 
@@ -154,6 +164,13 @@ ss.event.on 'endGame', (playerId, game) ->
     .show()
     .attr('disabled', false)
     .text(newGameText)
+    .click ->
+      ss.rpc 'game.new', (ready) =>
+        if ready
+          $(this).fadeOut();
+        else
+          $(this).attr("disabled", true).text('Waiting for player...')
+          $(this).unbind('click')
 
 ss.event.on 'yourTurn', (game) ->
   console.log "Your turn in game #{game.id}"
