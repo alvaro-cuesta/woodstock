@@ -4,13 +4,16 @@ Game = require '../models/game'
 
 BOARD_WIDTH = 27
 BOARD_HEIGHT = 17
-BOARD_MINES = 10
+BOARD_MINES = 52
 
 GAME_SECONDS = 30
 TURN_SECONDS = 3
 
 games = []
 waiting = null
+
+epoch = ->
+  +new Date / 1000
 
 stats =
   played: 0
@@ -20,12 +23,15 @@ stats =
 sendStats = (ss) ->
   ss.publish.all 'stats', stats
 
-notifyTurn = (game, ss) ->
+changeTurn = (game, ss) ->
+  game.turn = (game.turn + 1) % game.players.length
+  game.endTurn = parseInt(epoch() + TURN_SECONDS)
+
   for player in game.players
     if game.players[game.turn] == player
-      ss.publish.socketId player, 'yourTurn', game.id
+      ss.publish.socketId player, 'yourTurn', cleanGame(game)
     else
-      ss.publish.socketId player, 'notYourTurn', game.id
+      ss.publish.socketId player, 'notYourTurn', cleanGame(game)
 
 newTurnTimeout = (game, ss) ->
   if game.turnTimeout
@@ -33,7 +39,7 @@ newTurnTimeout = (game, ss) ->
 
   game.turnTimeout = setTimeout ->
     newTurnTimeout(game, ss)
-    notifyTurn(game, ss)
+    changeTurn(game, ss)
   , TURN_SECONDS * 1000
 
 endGame = (game, ss) ->
@@ -47,9 +53,6 @@ endGame = (game, ss) ->
   stats.inProgress -= 1
   sendStats(ss)
 
-epoch = ->
-  +new Date / 1000
-
 cleanGame = (game) ->
   id: game.id
   width: game.width
@@ -62,6 +65,7 @@ cleanGame = (game) ->
   turn: game.turn
   scores: game.scores
   endEpoch: game.endEpoch
+  endTurn: game.endTurn
 
 exports.actions = (req, res, ss) ->
   new: ->
@@ -72,7 +76,7 @@ exports.actions = (req, res, ss) ->
       gameId++ while games[gameId]
 
       game = new Game gameId, BOARD_WIDTH, BOARD_HEIGHT, BOARD_MINES,
-        epoch() + GAME_SECONDS, TURN_SECONDS, [waiting, player]
+        parseInt(epoch() + GAME_SECONDS), parseInt(epoch() + TURN_SECONDS), [waiting, player]
 
       games[gameId] = game
 
@@ -83,13 +87,13 @@ exports.actions = (req, res, ss) ->
       ss.publish.all 'waiting', false
       ss.publish.socketId player, 'newGame', cleanGame(game)
       ss.publish.socketId waiting, 'newGame', cleanGame(game)
-      ss.publish.socketId game.players[game.turn], 'yourTurn', gameId
+      ss.publish.socketId game.players[game.turn], 'yourTurn', cleanGame(game)
 
       game.globalTimeout = setTimeout ->
         endGame(game, ss)
       , GAME_SECONDS * 1000
       newTurnTimeout(game, ss)
-      notifyTurn(game, ss)
+      changeTurn(game, ss)
 
       waiting = null
       res true
@@ -128,8 +132,7 @@ exports.actions = (req, res, ss) ->
         endGame(game, ss)
         return
     else
-      game.turn = (game.turn + 1) % game.players.length
-      notifyTurn(game, ss)
+      changeTurn(game, ss)
 
     newTurnTimeout(game, ss)
     for player, index in game.players

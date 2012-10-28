@@ -22,9 +22,9 @@ window.ss = require 'socketstream'
 
 ss.server.on 'disconnect', ->
   $('#game-status')
-    .removelass('connected')
+    .removeClass('connected')
     .addClass('not-connected')
-    .text('Not connected')
+    .text('Disconnected')
 
 ss.server.on 'reconnect', ->
   ss.rpc('game.getStats')
@@ -61,11 +61,20 @@ ss.event.on 'waiting', (waiting) ->
   newGameText = if waiting then 'Join waiting player' else 'New game'
   $('#newGame').text newGameText
 
-timeInterval = null
+timeIntervalGlobal = null
 epoch = ->
   +new Date / 1000
 pad2 = (number) ->
   (if number < 10 then '0' else '') + number
+
+updateTurnInterval = (game) ->
+  console.log game.endTurn
+  remainingTurn = game.endTurn - epoch()
+  $('#turn-time').text("#{pad2(parseInt(remainingTurn / 60))}:#{pad2(parseInt(remainingTurn % 60))}")
+  timeIntervalTurn = setInterval ->
+    remainingTurn = game.endTurn - epoch()
+    $('#turn-time').text("#{pad2(parseInt(remainingTurn / 60))}:#{pad2(parseInt(remainingTurn % 60))}")
+  , 1000
 
 ss.event.on 'newGame', (game) ->
   console.log "Starting game #{game.id}"
@@ -80,13 +89,14 @@ ss.event.on 'newGame', (game) ->
   $('#oponent-points').text '0'
   $('#newGame').hide()
 
-  remaining = game.endEpoch - epoch()
-  $('#game-time').text("#{pad2(parseInt(remaining / 60))}:#{pad2(parseInt(remaining % 60))}")
-
-  timeInterval = setInterval ->
-    remaining = game.endEpoch - epoch()
-    $('#game-time').text("#{pad2(parseInt(remaining / 60))}:#{pad2(parseInt(remaining % 60))}")
+  remainingGlobal = game.endEpoch - epoch()
+  $('#game-time').text("#{pad2(parseInt(remainingGlobal / 60))}:#{pad2(parseInt(remainingGlobal % 60))}")
+  timeIntervalGlobal = setInterval ->
+    remainingGlobal = game.endEpoch - epoch()
+    $('#game-time').text("#{pad2(parseInt(remainingGlobal / 60))}:#{pad2(parseInt(remainingGlobal % 60))}")
   , 1000
+
+  updateTurnInterval(game)
 
 ss.event.on 'updatedGame', (playerId, game) ->
   console.log "Updated game #{game.id}. You are player #{playerId}."
@@ -103,6 +113,8 @@ ss.event.on 'updatedGame', (playerId, game) ->
   $('#player-points').text game.scores[playerId]
   $('#oponent-points').text game.scores[(playerId + 1) % 2]
 
+  updateTurnInterval(game)
+
 ss.event.on 'endGame', (playerId, game) ->
   console.log "Finished game #{game.id}"
   console.log game
@@ -115,8 +127,10 @@ ss.event.on 'endGame', (playerId, game) ->
   $board.html ''
   board.appendTo $board
 
-  clearInterval timeInterval
-  timeInterval = null
+  clearInterval timeIntervalGlobal
+  clearInterval timeIntervalTurn
+  timeIntervalGlobal = null
+  timeIntervalTurn = null
 
   $('#player-points').text game.scores[playerId]
   $('#oponent-points').text game.scores[(playerId + 1) % 2]
@@ -137,8 +151,8 @@ ss.event.on 'endGame', (playerId, game) ->
     .attr('disabled', false)
     .text(newGameText)
 
-ss.event.on 'yourTurn', (gameId) ->
-  console.log "Your turn in game #{gameId}"
+ss.event.on 'yourTurn', (game) ->
+  console.log "Your turn in game #{game.id}"
   console.log game
 
   $('#turn-title')
@@ -146,14 +160,18 @@ ss.event.on 'yourTurn', (gameId) ->
     .removeClass('opponent-turn')
     .text('Your turn')
 
-ss.event.on 'notYourTurn', (gameId) ->
-  console.log "Not your turn in game #{gameId}"
+  updateTurnInterval(game)
+
+ss.event.on 'notYourTurn', (game) ->
+  console.log "Not your turn in game #{game.id}"
   console.log game
 
   $('#turn-title')
     .removeClass('your-turn')
     .addClass('opponent-turn')
     .text("Opponent's turn")
+
+  updateTurnInterval(game)
 
 ss.event.on 'stats', (stats) ->
   $('#games-in-progress').text(stats.inProgress)
