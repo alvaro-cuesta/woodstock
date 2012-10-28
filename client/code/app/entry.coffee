@@ -52,8 +52,11 @@ ss.event.on 'newGame', (game) ->
   $board.html ''
   board.appendTo $board
 
-ss.event.on 'updatedGame', (game) ->
-  console.log "Updated game #{game.id}"
+  $('#player-points').text '0'
+  $('#oponent-points').text '0'
+
+ss.event.on 'updatedGame', (playerId, game) ->
+  console.log "Updated game #{game.id}. You are player #{playerId}."
   console.log game
 
   $board = $('#board')
@@ -64,16 +67,19 @@ ss.event.on 'updatedGame', (game) ->
   $board.html ''
   board.appendTo $board
 
-ss.event.on 'endGame', (game) ->
-  console.log "Finished game #{game.id}"
+  $('#player-points').text game.scores[playerId]
+  $('#oponent-points').text game.scores[(playerId + 1) % 2]
+
+ss.event.on 'endGame', (gameId) ->
+  console.log "Finished game #{gameId}"
   console.log game
 
-ss.event.on 'yourTurn', (game) ->
-  console.log "Your turn in game #{game.id}"
+ss.event.on 'yourTurn', (gameId) ->
+  console.log "Your turn in game #{gameId}"
   console.log game
 
-ss.event.on 'notYourTurn', (game) ->
-  console.log "Not your turn in game #{game.id}"
+ss.event.on 'notYourTurn', (gameId) ->
+  console.log "Not your turn in game #{gameId}"
   console.log game
 
 module.exports.looper = ->

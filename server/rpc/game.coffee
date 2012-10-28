@@ -15,9 +15,9 @@ waiting = null
 notifyTurn = (game, ss) ->
   for player in game.players
     if game.players[game.turn] == player
-      ss.publish.socketId player, 'yourTurn', cleanGame(game)
+      ss.publish.socketId player, 'yourTurn', game.id
     else
-      ss.publish.socketId player, 'notYourTurn', cleanGame(game)
+      ss.publish.socketId player, 'notYourTurn', game.id
 
 newTurnTimeout = (game, ss) ->
   if game.turnTimeout
@@ -34,7 +34,7 @@ endGame = (game) ->
   if game.turnTimeout
     clearTimeout game.turnTimeout
   for player in game.players
-    ss.publish.socketId player, 'endGame', cleanGame(game)
+    ss.publish.socketId player, 'endGame', game.id
     delete games[game.id]
 
 cleanGame = (game) ->
@@ -64,7 +64,7 @@ exports.actions = (req, res, ss) ->
 
       ss.publish.socketId player, 'newGame', cleanGame(game)
       ss.publish.socketId waiting, 'newGame', cleanGame(game)
-      ss.publish.socketId game.players[game.turn], 'yourTurn', cleanGame(game)
+      ss.publish.socketId game.players[game.turn], 'yourTurn', gameId
 
       game.globalTimeout = setTimeout endGame, GAME_SECONDS * 1000
       newTurnTimeout(game, ss)
@@ -96,8 +96,8 @@ exports.actions = (req, res, ss) ->
         game.turn = (game.turn + 1) % game.players.length
 
       newTurnTimeout(game, ss)
-      for player in game.players
-        ss.publish.socketId player, 'updatedGame', cleanGame(game)
+      for player, index in game.players
+        ss.publish.socketId player, 'updatedGame', index, cleanGame(game)
  
       console.log game.turn
 
