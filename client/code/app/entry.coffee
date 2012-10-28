@@ -21,13 +21,24 @@ for i in [1:100]
 window.ss = require 'socketstream'
 
 ss.server.on 'disconnect', ->
-  console.log('Connection down :-(')
+  $('#game-status')
+    .removelass('connected')
+    .addClass('not-connected')
+    .text('Not connected')
 
 ss.server.on 'reconnect', ->
-  console.log('Connection back up :-)')
+  $('#game-status')
+    .addClass('connected')
+    .removeClass('not-connected')
+    .text('Connected')
 
 ss.server.on 'ready', ->
   jQuery ->
+    $('#game-status')
+      .addClass('connected')
+      .removeClass('not-connected')
+      .text('Connected')
+
     $('#newGame').click ->
       ss.rpc 'game.new', (ready) =>
         if ready
@@ -71,14 +82,33 @@ ss.event.on 'updatedGame', (playerId, game) ->
   $('#player-points').text game.scores[playerId]
   $('#oponent-points').text game.scores[(playerId + 1) % 2]
 
-ss.event.on 'endGame', (gameId) ->
-  console.log "Finished game #{gameId}"
+ss.event.on 'endGame', (playerId, game) ->
+  console.log "Finished game #{game.id}"
   console.log game
 
-  $ '#newGame'
+  $board = $('#board')
+  board = new Board game.id, game.width, game.height
+  for x in [0..(game.width-1)]
+    for y in [0..(game.height-1)]
+      board.tiles[x][y].set game.state[x][y]
+  $board.html ''
+  board.appendTo $board
+
+  if game.scores[playerId] > game.scores[(playerId + 1) % 2]
+    $('#turn-title')
+      .addClass('your-turn')
+      .removeClass('opponent-turn')
+      .text('You won!')
+  else
+    $('#turn-title')
+      .removeClass('your-turn')
+      .addClass('opponent-turn')
+      .text('You lose...')
+
+  $('#newGame')
     .show()
-    .attr 'disabled', false
-    .text 'New game'
+    .attr('disabled', false)
+    .text('New game')
 
 ss.event.on 'yourTurn', (gameId) ->
   console.log "Your turn in game #{gameId}"
