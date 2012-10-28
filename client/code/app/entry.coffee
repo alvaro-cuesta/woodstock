@@ -57,10 +57,23 @@ ss.server.on 'ready', ->
 
     player_is_high = false;
 
+newGameInterval = null
 newGameText = 'New game'
 ss.event.on 'waiting', (waiting) ->
   $newGame = $('#newGame')
-  newGameText = if waiting then 'Join waiting player' else 'New game'
+  if waiting
+    newGameText = 'Join waiting player'
+    newGameInterval = setInterval ->
+      $newGame
+        .toggleClass('success')
+        .toggleClass('alert')
+    , 1000
+  else
+    clearInterval newGameInterval
+    newGameText = 'New game'
+    $newGame
+      .removeClass('alert')
+      .addClass('success')
   $newGame.text(newGameText)
 
 timeIntervalGlobal = null
