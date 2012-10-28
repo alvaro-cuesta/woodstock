@@ -33,9 +33,17 @@ body
       .row
         #board.eight.columns
         .four.columns.sidebar
-          h2 List of games / Chat
+          h2 Game time: 
+            span#game-time 00:00
+          h2 This turn: 
+            span#turn-time 00:00
+          h2 Your points: 
+            span#player-points 0
+          h2 Opponent points: 
+            span#oponent-points 0
+
   .row
-    #subheader.twelve.columns
+    #status-bar.twelve.columns
       strong Network status: 
       | Not connected
 !{'</html>'}
