@@ -15,7 +15,7 @@ stats =
   inProgress: 0
   found: 0
 
-if fs.existsSync('./stats.json')
+fs.exists './stats.json', ->
   data = JSON.parse(fs.readFileSync './stats.json', 'utf8')
   stats =
     played: data.played
