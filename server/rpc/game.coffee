@@ -27,9 +27,9 @@ changeTurn = (game, ss) ->
 
   for player in game.players
     if game.players[game.turn] == player
-      ss.publish.socketId player, 'yourTurn', cleanGame(game)
+      ss.publish.socketId player, 'yourTurn', game.clean()
     else
-      ss.publish.socketId player, 'notYourTurn', cleanGame(game)
+      ss.publish.socketId player, 'notYourTurn', game.clean()
 
 newTurnTimeout = (game, ss) ->
   if game.turnTimeout
@@ -51,20 +51,6 @@ endGame = (game, ss) ->
   stats.inProgress -= 1
   sendStats(ss)
 
-cleanGame = (game) ->
-  id: game.id
-  width: game.width
-  height: game.height
-  mines: game.mines
-  gameDuration: game.gameDuration
-  turnDuration: game.turnDuration
-  players: game.players
-  state: game.state
-  turn: game.turn
-  scores: game.scores
-  endEpoch: game.endEpoch
-  endTurn: game.endTurn
-
 exports.actions = (req, res, ss) ->
   new: ->
     player = req.socketId
@@ -83,9 +69,9 @@ exports.actions = (req, res, ss) ->
       sendStats(ss)
 
       ss.publish.all 'waiting', false
-      ss.publish.socketId player, 'newGame', cleanGame(game)
-      ss.publish.socketId waiting, 'newGame', cleanGame(game)
-      ss.publish.socketId game.players[game.turn], 'yourTurn', cleanGame(game)
+      ss.publish.socketId player, 'newGame', game.clean()
+      ss.publish.socketId waiting, 'newGame', game.clean()
+      ss.publish.socketId game.players[game.turn], 'yourTurn', game.clean()
 
       game.globalTimeout = setTimeout ->
         endGame(game, ss)
@@ -119,8 +105,8 @@ exports.actions = (req, res, ss) ->
       res false
       return
 
-    console.log game.state
     game.uncover(x, y)
+
     if game.state[x][y] < 0  # There is a mine
       stats.found += 1
       sendStats(ss)
@@ -134,7 +120,7 @@ exports.actions = (req, res, ss) ->
 
     newTurnTimeout(game, ss)
     for player, index in game.players
-      ss.publish.socketId player, 'updatedGame', index, cleanGame(game)
+      ss.publish.socketId player, 'updatedGame', index, game.clean()
 
     res true
 

@@ -38,4 +38,18 @@ class Game
           if (0 <= x+i < @width) and (0 <= y+j < @height) and (@state[x+i][y+j] == false)
             @uncover x+i, y+j
 
+  clean: ->
+    id: @id
+    width: @width
+    height: @height
+    mines: @mines
+    gameDuration: @gameDuration
+    turnDuration: @turnDuration
+    players: @players
+    state: @state
+    turn: @turn
+    scores: @scores
+    endEpoch: @endEpoch
+    endTurn: @endTurn
+
 module.exports = Game
