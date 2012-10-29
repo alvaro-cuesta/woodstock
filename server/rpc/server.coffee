@@ -1,3 +1,4 @@
+fs = require 'fs'
 Game = require '../controllers/game'
 
 PLAYERS_PER_GAME = 2
@@ -9,12 +10,24 @@ games = []
 
 ## Statistics ##
 
-stats =
+stats = 
   played: 0
   inProgress: 0
   found: 0
 
+if fs.existsSync('./stats.json')
+  data = JSON.parse(fs.readFileSync './stats.json', 'utf8')
+  stats =
+    played: data.played
+    inProgress: 0
+    found: data.found
+
+console.log stats
+
 syncStats = (ss) ->
+  fs.writeFile './stats.json', JSON.stringify(stats), (err) ->
+    if err
+        console.log 'Error serializing stats.', err
   ss.publish.all 'stats', stats
 
 ## Exports ##
@@ -28,6 +41,7 @@ exports.found = (ss) ->
 exports.removeGame = (game, ss) ->
   delete games[game.id]
   stats.inProgress -= 1
+  stats.inProgress = 0 if stats.inProgress < 0
   syncStats(ss)
 
 exports.actions = (req, res, ss) ->
@@ -51,6 +65,9 @@ exports.actions = (req, res, ss) ->
       gameId++ while games[gameId]
       games[gameId] = game = new Game gameId, waiting
 
+      console.log gameId
+      console.log games
+
       res true
 
       game.sendAll('newGame', ss)
@@ -64,7 +81,6 @@ exports.actions = (req, res, ss) ->
 
       waiting = []
 
-    console.log (x.nick for x in waiting)
     ss.publish.all 'waiting', (x.nick for x in waiting) or []
 
   ## Sync server status ##

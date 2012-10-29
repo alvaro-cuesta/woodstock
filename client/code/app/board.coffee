@@ -6,7 +6,8 @@ module.exports = (id, width, height) ->
       tile = new Tile
       do (tile, x, y) ->
         tile.click ->
-          ss.rpc 'game.click', id, x, y
+          ss.rpc 'game.click', id, x, y, (err) ->
+            console.log err if err
       tile
 
   appendTo: ($board) ->

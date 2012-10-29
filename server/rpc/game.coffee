@@ -2,26 +2,27 @@ Server = require './server'
 
 exports.actions = (req, res, ss) ->
   click: (gameId, x, y) ->
+    console.log Server.games
     game = Server.games[gameId]
     
     # Check if game exists
     if not game
-      res false
+      res "Game #{gameId} does not exist."
       return 
 
     # Check player turn
     if game.players[game.turn].socket != req.socketId
-      res false
+      res "It's not your turn."
       return
 
     # Check click bounds
     if not (0 <= x < game.width) or not (0 <= y < game.height)
-      res false
+      res "#{x},#{y} is out of bounds."
       return
 
     # Check if tile is uncoverable
     if game.state[x][y] != false
-      res false
+      res "#{x},#{y} is already clicked."
       return
 
     game.uncover(x, y, ss)  # Do the magic, baby
@@ -37,4 +38,4 @@ exports.actions = (req, res, ss) ->
     else
       game.newTurn(ss)
 
-    res true
+    res false
