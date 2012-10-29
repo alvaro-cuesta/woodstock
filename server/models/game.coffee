@@ -53,3 +53,4 @@ module.exports = class GameModel
     scores: @scores
     endGame: @endGame
     endTurn: @endTurn
+    players: [player['nick'] for player in @players]

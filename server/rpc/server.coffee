@@ -1,8 +1,10 @@
 Game = require '../controllers/game'
 
+PLAYERS_PER_GAME = 2
+
 ## Game list ##
 
-waiting = false
+waiting = []
 games = []
 
 ## Statistics ##
@@ -29,16 +31,24 @@ exports.removeGame = (game, ss) ->
   syncStats(ss)
 
 exports.actions = (req, res, ss) ->
-  new: ->
-    player = req.socketId
+  req.use('session')
 
-    if not waiting
-      waiting = player
-    else
+  new: ->
+    if req.sessionId in (x.session for x in waiting)
+      res false
+      return
+
+    if waiting.length < PLAYERS_PER_GAME
+      waiting.push
+        nick: req.session.nick
+        session: req.sessionId
+        socket: req.socketId
+
+    if waiting.length == PLAYERS_PER_GAME
       # Find a free game id and create game
       gameId = 0
       gameId++ while games[gameId]
-      games[gameId] = game = new Game gameId, [waiting, player]
+      games[gameId] = game = new Game gameId, waiting
 
       game.sendAll('newGame', ss)
       game.setGlobalTimer(ss)
@@ -49,14 +59,16 @@ exports.actions = (req, res, ss) ->
       stats.inProgress += 1
       syncStats(ss)
 
-      waiting = false
+      waiting = []
 
-    ss.publish.all 'waiting', waiting
-    res waiting == false
+    console.log (x.nick for x in waiting)
+    ss.publish.all 'waiting', (x.nick for x in waiting) or []
+    res true
 
   ## Sync server status ##
 
   update: ->
+    console.log waiting
     ss.publish.socketId req.socketId, 'stats', stats
-    ss.publish.socketId req.socketId, 'waiting', waiting
+    ss.publish.socketId req.socketId, 'waiting', (x.nick for x in waiting) or []
     res true

@@ -7,7 +7,7 @@ epoch = ->
 module.exports = class Game extends GameModel
   sendAll: (event, ss) ->
     for player, index in @players
-      ss.publish.socketId player, event, index, @clean()
+      ss.publish.socketId player.socket, event, index, @clean()
 
   setGlobalTimer: (ss) ->
     @endGame = epoch() + @gameDuration
@@ -31,4 +31,5 @@ module.exports = class Game extends GameModel
     clearTimeout @globalTimeout if @globalTimeout
     clearTimeout @turnTimeout if @turnTimeout
     Server.removeGame(this, ss)
+          
     @sendAll('endGame', ss)

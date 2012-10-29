@@ -17,7 +17,7 @@ ss.server.on 'ready', ->
 ## Logging ##
 
 ss.event.on 'waiting', (waiting) ->
-  console.log "[SERVER] Waiting: #{waiting}"
+  console.log "[SERVER] Waiting:", waiting
 
 ss.event.on 'stats', (stats) ->
   console.log "[SERVER] Stats: ", stats

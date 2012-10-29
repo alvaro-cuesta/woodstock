@@ -10,27 +10,27 @@ ss.server.on 'ready', ->
 
     newGameInterval = null
     ss.event.on 'waiting', (waiting) ->
-      if waiting
-        $newGame.text(JOIN_GAME_TEXT)
-        # Set success/alert cycle
+      if waiting.length
+        if $newGame.text() != WAITING_GAME_TEXT
+          $newGame.text(JOIN_GAME_TEXT)
         newGameInterval = setInterval ->
           $newGame
             .toggleClass('success')
             .toggleClass('alert')
         , 1000
       else
-        $newGame.text(NEW_GAME_TEXT)
-        # Remove success/alert cycle
-        clearInterval newGameInterval
+        clearInterval newGameInterval if newGameInterval
+        newGameInterval = null
         $newGame
           .removeClass('alert')
           .addClass('success')
+          .text(NEW_GAME_TEXT)
 
     ## New Game click handler ##
 
     newGameClickHandler = ->
-      ss.rpc 'server.new', (ready) =>
-        if not ready
+      ss.rpc 'server.new', (success) =>
+        if success
           $(this)
             .attr('disabled', true)
             .text(WAITING_GAME_TEXT)

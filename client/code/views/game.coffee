@@ -22,10 +22,6 @@ ss.server.on 'ready', ->
       $board.html ''
       board.appendTo $board
 
-      # Reset score labels
-      $player_points.text '0'
-      $opponent_points.text '0'
-
     ## Updated game ##
 
     ss.event.on 'updatedGame', (player, game) ->

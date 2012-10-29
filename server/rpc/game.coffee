@@ -10,7 +10,7 @@ exports.actions = (req, res, ss) ->
       return 
 
     # Check player turn
-    if game.players[game.turn] != req.socketId
+    if game.players[game.turn].socket != req.socketId
       res false
       return
 
