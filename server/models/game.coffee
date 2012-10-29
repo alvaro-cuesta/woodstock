@@ -2,7 +2,7 @@ rand = (min, max) ->
   min + Math.floor Math.random() * max
 
 module.exports = class GameModel
-  constructor: (@id, @players, @width=27, @height=17, @mines=52, @gameDuration=30, @turnDuration=15) ->
+  constructor: (@id, @players, @width=27, @height=17, @mines=52, @gameDuration=180, @turnDuration=10) ->
     # <0   - mine
     # >=0  - number of surrounding mines
     # false   - covered
