@@ -1,6 +1,3 @@
-# TODO:
-#  Controlar mejor tiempos (setTimeout no es preciso)
-
 rand = (min, max) ->
   min + Math.floor Math.random() * max
 

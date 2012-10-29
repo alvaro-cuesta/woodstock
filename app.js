@@ -4,9 +4,7 @@ var http = require('http'),
 // MAIN PAGE
 ss.client.define('main', {
     view: 'app.jade',
-    css:  ['libs/reset.css',
-           'libs/foundation.css',
-           'app.less'],
+    css:  ['libs/foundation.css', 'app.less'],
     code: ['libs/jquery.min.js',
            'libs/jquery.foundation.mediaQueryToggle.js',
            'libs/jquery.foundation.forms.js',
@@ -23,6 +21,7 @@ ss.client.define('main', {
            'libs/modernizr.foundation.js',
            'libs/app.js',
            'app',
+           'views',
            'piv'],
     tmpl: '*'
 });
@@ -32,7 +31,6 @@ ss.http.route('/').serveClient('main');
 // PLUGINS
 ss.client.formatters.add(require('ss-coffee'));
 ss.client.formatters.add(require('ss-jade'));
-ss.client.formatters.add(require('ss-stylus'));
 ss.client.formatters.add(require('./ss-less'));
 ss.client.templateEngine.use(require('ss-hogan'));
 

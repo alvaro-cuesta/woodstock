@@ -1,5 +1,5 @@
 
-module.exports = function() {
+module.exports = function(canvas) {
 
 	gradation = this;
 
@@ -7,30 +7,30 @@ module.exports = function() {
 
 	}
 
-	gradation.draw = function(canvas) {
+	gradation.draw = function() {
 		// Top
 		/*
-		var grd = ctx.createLinearGradient(0, 0, 0, 200);
+		var grd = canvas.ctx.createLinearGradient(0, 0, 0, 200);
 
 		grd.addColorStop(0, "rgba(37, 40, 49, 1)");
 		grd.addColorStop(0.5, "rgba(37, 40, 49, 0.4)");
 		grd.addColorStop(1, "rgba(37, 40, 49, 0)");
 
 		// Fill with gradient
-		ctx.fillStyle = grd;
-		ctx.fillRect(0, 0, canvas.width, 200);
+		canvas.ctx.fillStyle = grd;
+		canvas.ctx.fillRect(0, 0, canvas.width, 200);
 		*/
 
 		// Bottom
-		var grd = ctx.createLinearGradient(0, 100, 0, 500);
+		var grd = canvas.ctx.createLinearGradient(0, 100, 0, 500);
 
 		grd.addColorStop(0, "rgba(37, 40, 49, 0)");
 		grd.addColorStop(0.5, "rgba(37, 40, 49, 0.8)");
 		grd.addColorStop(1, "rgba(37, 40, 49, 1)");
 
 		// Fill with gradient
-		ctx.fillStyle = grd;
-		ctx.fillRect(0, 0, canvas.width, 500);
+		canvas.ctx.fillStyle = grd;
+		canvas.ctx.fillRect(0, 0, canvas.width, 500);
 	}
 
 }

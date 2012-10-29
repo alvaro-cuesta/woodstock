@@ -1,8 +1,9 @@
 
-module.exports = function() {
+module.exports = function($c) {
 	var canvas = this;
 
-	canvas.c = document.getElementById('c');
+	canvas.c = c[0]
+        canvas.$c = $c
 	canvas.ctx = c.getContext("2d");
 	
 	c.width = $(document).innerWidth();

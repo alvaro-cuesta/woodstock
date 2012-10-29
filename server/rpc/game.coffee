@@ -1,5 +1,3 @@
-# Better time handling
-
 Game = require '../models/game'
 
 BOARD_WIDTH = 27
@@ -140,7 +138,7 @@ exports.actions = (req, res, ss) ->
 
     res true
 
-  getStats: ->
+  synchronize: ->
     ss.publish.socketId req.socketId, 'stats', stats
     ss.publish.socketId req.socketId, 'waiting', waiting
     res true
