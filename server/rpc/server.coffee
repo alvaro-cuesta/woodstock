@@ -43,12 +43,15 @@ exports.actions = (req, res, ss) ->
         nick: req.session.nick
         session: req.sessionId
         socket: req.socketId
+      res true
 
     if waiting.length == PLAYERS_PER_GAME
       # Find a free game id and create game
       gameId = 0
       gameId++ while games[gameId]
       games[gameId] = game = new Game gameId, waiting
+
+      res true
 
       game.sendAll('newGame', ss)
       game.setGlobalTimer(ss)
@@ -63,7 +66,6 @@ exports.actions = (req, res, ss) ->
 
     console.log (x.nick for x in waiting)
     ss.publish.all 'waiting', (x.nick for x in waiting) or []
-    res true
 
   ## Sync server status ##
 

@@ -43,7 +43,6 @@ ss.server.on 'ready', ->
       $newGame
         .fadeOut()
         .attr('disabled', true)
-        .text(NEW_GAME_TEXT)
         .unbind('click')
 
     ## Enable button on game end ##
@@ -52,4 +51,5 @@ ss.server.on 'ready', ->
       $newGame
         .fadeIn()
         .attr('disabled', false)
+        .text(NEW_GAME_TEXT)
         .click(newGameClickHandler)
