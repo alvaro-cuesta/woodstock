@@ -1,4 +1,5 @@
 fs = require 'fs'
+fs.existsSync = fs.existsSync || require('path').existsSync;
 Game = require '../controllers/game'
 
 PLAYERS_PER_GAME = 2
@@ -15,7 +16,7 @@ stats =
   inProgress: 0
   found: 0
 
-fs.exists './stats.json', ->
+if fs.existsSync './stats.json'
   data = JSON.parse(fs.readFileSync './stats.json', 'utf8')
   stats =
     played: data.played
