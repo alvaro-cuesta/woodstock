@@ -28,7 +28,7 @@ ss.server.on 'ready', ->
 
     ## Updated game ##
 
-    ss.event.on 'updatedGame', (playerId, game) ->
+    ss.event.on 'updatedGame', (player, game) ->
       # Setup updated board # TODO: Fix this shit
       board = new Board game.id, game.width, game.height
       for x in [0..(game.width-1)]
@@ -38,12 +38,24 @@ ss.server.on 'ready', ->
       board.appendTo $board
 
       # Update score labels
-      $player_points.text game.scores[playerId]
-      $opponent_points.text game.scores[(playerId + 1) % 2]
+      $player_points.text game.scores[player]
+      $opponent_points.text game.scores[(player + 1) % 2]
+
+      # Turn label
+      if player == game.turn
+        $turn_title
+          .addClass('your-turn')
+          .removeClass('opponent-turn')
+          .text(YOUR_TURN_TEXT)
+      else
+        $turn_title
+          .removeClass('your-turn')
+          .addClass('opponent-turn')
+          .text(OPPONENT_TURN_TEXT)
 
     ## End game ##
 
-    ss.event.on 'endGame', (playerId, game) ->
+    ss.event.on 'endGame', (player, game) ->
       # Setup final board # TODO: Fix this shit
       board = new Board game.id, game.width, game.height
       for x in [0..(game.width-1)]
@@ -53,8 +65,8 @@ ss.server.on 'ready', ->
       board.appendTo $board
 
       # Update scores
-      myScore = game.scores[playerId]
-      opponentScore = game.scores[(playerId + 1) % 2]
+      myScore = game.scores[player]
+      opponentScore = game.scores[(player + 1) % 2]
       $player_points.text myScore
       $opponent_points.text opponentScore
 
@@ -74,20 +86,6 @@ ss.server.on 'ready', ->
       else
         $turn_title
           .removeClass('won')
-          .addClass('lost')
-          .removeClass('tied')
+          .removeClass('lost')
+          .addClass('tied')
           .text(TIE_TEXT)
-
-    ## Turn label ##
-
-    ss.event.on 'yourTurn', (game) ->
-      $turn_title
-        .addClass('your-turn')
-        .removeClass('opponent-turn')
-        .text(YOUR_TURN_TEXT)
-
-    ss.event.on 'notYourTurn', (game) ->
-      $turn_title
-        .removeClass('your-turn')
-        .addClass('opponent-turn')
-        .text(OPPONENT_TURN_TEXT)

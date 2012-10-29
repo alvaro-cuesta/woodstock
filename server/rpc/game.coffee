@@ -1,130 +1,40 @@
-Game = require '../models/game'
-
-BOARD_WIDTH = 27
-BOARD_HEIGHT = 17
-BOARD_MINES = 52
-
-GAME_SECONDS = 240
-TURN_SECONDS = 15
-
-games = []
-waiting = null
-
-epoch = ->
-  parseInt(+new Date / 1000)
-
-stats =
-  played: 0
-  inProgress: 0
-  found: 0
-
-sendStats = (ss) ->
-  ss.publish.all 'stats', stats
-
-changeTurn = (game, ss) ->
-  game.turn = (game.turn + 1) % game.players.length
-  game.endTurn = epoch() + TURN_SECONDS
-
-  for player in game.players
-    if game.players[game.turn] == player
-      ss.publish.socketId player, 'yourTurn', game.clean()
-    else
-      ss.publish.socketId player, 'notYourTurn', game.clean()
-
-newTurnTimeout = (game, ss) ->
-  if game.turnTimeout
-    clearTimeout game.turnTimeout
-
-  game.turnTimeout = setTimeout ->
-    newTurnTimeout(game, ss)
-    changeTurn(game, ss)
-  , TURN_SECONDS * 1000
-
-endGame = (game, ss) ->
-  if game.globalTimeout
-    clearTimeout game.globalTimeout
-  if game.turnTimeout
-    clearTimeout game.turnTimeout
-  for player, index in game.players
-    ss.publish.socketId player, 'endGame', index, game
-    delete games[game.id]
-  stats.inProgress -= 1
-  sendStats(ss)
+Server = require './server'
 
 exports.actions = (req, res, ss) ->
-  new: ->
-    player = req.socketId
-
-    if waiting
-      gameId = 0
-      gameId++ while games[gameId]
-
-      game = new Game gameId, BOARD_WIDTH, BOARD_HEIGHT, BOARD_MINES,
-        epoch() + GAME_SECONDS, epoch() + TURN_SECONDS, [waiting, player]
-
-      games[gameId] = game
-
-      stats.played += 1
-      stats.inProgress += 1
-      sendStats(ss)
-
-      ss.publish.all 'waiting', false
-      ss.publish.socketId player, 'newGame', game.clean()
-      ss.publish.socketId waiting, 'newGame', game.clean()
-      ss.publish.socketId game.players[game.turn], 'yourTurn', game.clean()
-
-      game.globalTimeout = setTimeout ->
-        endGame(game, ss)
-      , GAME_SECONDS * 1000
-      newTurnTimeout(game, ss)
-      changeTurn(game, ss)
-
-      waiting = null
-      res true
-    else
-      ss.publish.all 'waiting', true
-      waiting = player
-      res false
-
   click: (gameId, x, y) ->
-    game = games[gameId]
+    game = Server.games[gameId]
     
+    # Check if game exists
     if not game
       res false
       return 
 
+    # Check player turn
     if game.players[game.turn] != req.socketId
       res false
       return
 
-    if not (0 <= x < game.width and 0 <= y < game.height)
+    # Check click bounds
+    if not (0 <= x < game.width) or not (0 <= y < game.height)
       res false
       return
 
+    # Check if tile is uncoverable
     if game.state[x][y] != false
       res false
       return
 
-    game.uncover(x, y)
+    game.uncover(x, y, ss)  # Do the magic, baby
 
-    if game.state[x][y] < 0  # There is a mine
-      stats.found += 1
-      sendStats(ss)
+    if game.state[x][y] < 0
+      Server.found(ss)
       game.scores[game.turn] += 1
-      totalMines = game.scores.reduce (t, s) -> t + s
-      if totalMines == game.mines
-        endGame(game, ss)
-        return
+      game.resetTurnTimer(ss)
+
+      # Check if game finished
+      totalScore = game.scores.reduce (t, s) -> t + s
+      game.end(ss) if totalScore == game.mines
     else
-      changeTurn(game, ss)
+      game.newTurn(ss)
 
-    newTurnTimeout(game, ss)
-    for player, index in game.players
-      ss.publish.socketId player, 'updatedGame', index, game.clean()
-
-    res true
-
-  synchronize: ->
-    ss.publish.socketId req.socketId, 'stats', stats
-    ss.publish.socketId req.socketId, 'waiting', waiting
     res true

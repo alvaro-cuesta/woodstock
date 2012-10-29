@@ -29,7 +29,7 @@ ss.server.on 'ready', ->
     ## New Game click handler ##
 
     newGameClickHandler = ->
-      ss.rpc 'game.new', (ready) =>
+      ss.rpc 'server.new', (ready) =>
         if not ready
           $(this)
             .attr('disabled', true)
@@ -43,6 +43,7 @@ ss.server.on 'ready', ->
       $newGame
         .fadeOut()
         .attr('disabled', true)
+        .text(NEW_GAME_TEXT)
         .unbind('click')
 
     ## Enable button on game end ##
@@ -51,5 +52,4 @@ ss.server.on 'ready', ->
       $newGame
         .fadeIn()
         .attr('disabled', false)
-        .text(newGameText)
         .click(newGameClickHandler)

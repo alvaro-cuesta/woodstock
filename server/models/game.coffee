@@ -1,18 +1,18 @@
 rand = (min, max) ->
   min + Math.floor Math.random() * max
 
-## Base Game model (and a bit of controller hehe)
-class Game
-  constructor: (@id, @width, @height, @mines, @endEpoch, @endTurn, @players) ->
+module.exports = class GameModel
+  constructor: (@id, @players, @width=27, @height=17, @mines=52, @gameDuration=30, @turnDuration=15) ->
     # <0   - mine
-    # >=0  - # of surrounding mines
-    @board = ((0 for y in [0..(@height-1)]) for x in [0..(@width-1)])
+    # >=0  - number of surrounding mines
     # false   - covered
+    @board = ((0 for y in [0..(@height-1)]) for x in [0..(@width-1)])
     @state = ((false for y in [0..(@height-1)]) for x in [0..(@width-1)])
 
     # Drop random mines
     for k in [1..@mines]
-      loop  # Search for an empty spot
+      # Search for an empty spot
+      loop
         x = rand(0, @width)
         y = rand(0, @height)
         break if @board[x][y] >= 0
@@ -22,11 +22,14 @@ class Game
         for j in [-1..1]
           if (0 <= x+i < @width) and (0 <= y+j < @height)
             @board[x+i][y+j] += 1
-      @board[x][y] = -mines  # ...and mark the spot as a mine (<0)
 
-    @turn = rand(0, @players.length) # Random turn
+      # ...and mark the spot as a mine (<0)
+      @board[x][y] = -@mines
 
-    # Set player scores
+    # Random turn
+    @turn = rand(0, @players.length)
+
+    # Initialize player scores
     @scores = (0 for x in players)
 
   uncover: (x, y) ->
@@ -45,11 +48,8 @@ class Game
     mines: @mines
     gameDuration: @gameDuration
     turnDuration: @turnDuration
-    players: @players
     state: @state
     turn: @turn
     scores: @scores
-    endEpoch: @endEpoch
+    endGame: @endGame
     endTurn: @endTurn
-
-module.exports = Game
