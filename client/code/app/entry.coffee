@@ -3,6 +3,7 @@ window.ss = require 'socketstream'
 require '/psicodelia'
 require '/newgame'
 require '/game'
+require '/sidebar'
 require '/timers'
 require '/footer'
 
