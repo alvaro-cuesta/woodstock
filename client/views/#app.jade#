@@ -1,0 +1,74 @@
+!!! 5
+//if lt IE 7
+  !{'<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en">'}
+//if IE 7
+  !{'<html class="no-js lt-ie9 lt-ie8" lang="en">'}
+//if IE 8
+  !{'<html class="no-js lt-ie9" lang="en">'}
+//if gt IE 8
+  !{'<html class="no-js" lang="en">'}
+head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width')
+  != SocketStream
+  title Buscannabis
+  //if lt IE 9
+    script(src='http://html5shiv.googlecode.com/svn/trunk/html5.js')
+body
+  a(name='top')
+  canvas#c(width='5', height='5')
+  
+  .row
+    #logo.twelve.columns
+      img(src='/images/buscannabis-logo.png')
+
+  .row
+    #header.twelve.columns
+      ul
+        li
+          a#newGame.radius.success.button New game
+  .row
+    #game.twelve.columns
+      .row
+        #board.eight.columns
+        .four.columns.sidebar
+          h1#turn-title Game not started
+          h2 Game time: 
+            span#game-time 00:00
+          h2 This turn: 
+            span#turn-time 00:00
+          h2 Your points: 
+            span#player-points 0
+          h2 Opponent points: 
+            span#oponent-points 0
+
+  .row
+    #status-bar.twelve.columns
+      strong Game status: 
+      span#game-status Not connected
+      strong  | Games in progress: 
+      span#games-in-progress 0
+      strong  | Games played so far: 
+      span#games-played 0
+      strong  | Overall Marijuana found: 
+      span#marijuana-found 0
+
+  .row
+    #footer.twelve.columns
+      .centered
+        | Developed for the 
+        a(href="http://www.mediavida.com/foro/9/website-dare-ii-rise-of-the-evil-code-461879", target="_blank") MediaVida's Website Dare II
+        | , by
+      .row
+        .six.columns.right
+          a(href="http://www.mediavida.com/id/elkaoD", target="_blank")
+            img(src="http://www.mediavida.com/img/users/avatar/m2/m2_100240_big.gif") 
+            p
+              strong elkaoD
+        .six.columns
+          a(href="http://www.mediavida.com/id/piradoiv", target="_blank")
+            img(src="http://www.mediavida.com/img/users/avatar/4j/4jh10vIU_big.gif") 
+            p
+              strong PiradoIV
+              
+!{'</html>'}
