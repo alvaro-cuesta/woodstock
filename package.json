@@ -1,12 +1,13 @@
 {
   "name": "woodstock",
-  "description": "An awesome real time application",
+  "description": "PvP minesweeper",
   "version": "0.0.1",
   "author": "kaoD & Pirado_IV",
   "private": true,
   "engines": { "node": ">= 0.6.0" },
   "dependencies": {
     "socketstream": "0.3.x",
+    "coffee-script": "1.4.x",
     "ss-coffee": "0.1.x",
     "ss-jade": "0.1.x",
     "ss-hogan": "0.1.x",

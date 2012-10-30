@@ -11,9 +11,13 @@ require '/footer'
 
 ss.server.on 'ready', ->
   jQuery ->
-    ss.rpc('server.update')
-    ss.server.on 'reconnect', ->
-      ss.rpc('server.update')
+    ss.rpc('server.status')
+
+ss.server.on 'connect', ->
+  ss.rpc('server.status')
+
+ss.server.on 'reconnect', ->
+  ss.rpc('server.status')
 
 ## Logging ##
 

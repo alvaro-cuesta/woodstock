@@ -6,9 +6,13 @@ ss.server.on 'ready', ->
 
     ## New game ##
 
-    ss.event.on 'newGame', (game) ->
+    ss.event.on 'newGame', (player, game) ->
       # Setup new board
       board = new Board game.id, game.width, game.height
+      console.log game
+      for x in [0..(game.width-1)]
+        for y in [0..(game.height-1)]
+          board.tiles[x][y].set game.state[x][y]
       $board.html ''
       board.appendTo $board
 

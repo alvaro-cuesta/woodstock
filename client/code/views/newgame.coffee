@@ -29,7 +29,7 @@ ss.server.on 'ready', ->
     ## New Game click handler ##
 
     newGameClickHandler = ->
-      ss.rpc 'server.new', (success) =>
+      ss.rpc 'game.new', (success) =>
         if success
           $(this)
             .attr('disabled', true)
