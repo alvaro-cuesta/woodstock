@@ -34,6 +34,7 @@ ss.server.on 'ready', ->
       board = new Board game.id, game.width, game.height
       for x in [0..(game.width-1)]
         for y in [0..(game.height-1)]
-          board.tiles[x][y].set game.state[x][y]
+          state = game.state[x][y]
+          board.tiles[x][y].set state if state < 0
       $board.html ''
       board.appendTo $board

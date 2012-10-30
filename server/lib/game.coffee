@@ -1,8 +1,5 @@
 GameModel = require '../models/game'
 
-epoch = ->
-  parseInt(+new Date / 1000)
-
 module.exports = class Game extends GameModel
   start: (api) ->
     @sendAll('newGame', api)
@@ -18,13 +15,13 @@ module.exports = class Game extends GameModel
     @sendAll('endGame', api)
 
   setGlobalTimer: (api) ->
-    @endGame = epoch() + @gameDuration
+    @endGame = +new Date + @gameDuration * 1000
     @globalTimeout = setTimeout =>
       @end(api)
     , @gameDuration * 1000
 
   resetTurnTimer: (api) ->
-    @endTurn = epoch() + @turnDuration
+    @endTurn = +new Date + @turnDuration * 1000
     clearTimeout @turnTimeout if @turnTimeout
     @turnTimeout = setTimeout =>
       @newTurn(api)

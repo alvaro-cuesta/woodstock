@@ -1,5 +1,5 @@
-epoch = ->
-  parseInt(+new Date / 1000)
+time = require '/time'
+
 pad2 = (number) ->
   number = 0 if number < 0
   (if number < 10 then '0' else '') + parseInt(number)
@@ -14,8 +14,8 @@ ss.server.on 'ready', ->
     timeInterval = null
 
     updateLabels = (game) ->
-      remainingGame = game.endGame - epoch() - 1
-      remainingTurn = game.endTurn - epoch() - 1
+      remainingGame = parseInt((game.endGame - new Date - 1 - time.delta) / 1000)
+      remainingTurn = parseInt((game.endTurn - new Date - 1 - time.delta) / 1000)
       $game_time.text(sec2minsec(remainingGame))
       $turn_time.text(sec2minsec(remainingTurn))
 

@@ -6,18 +6,14 @@ require '/game'
 require '/sidebar'
 require '/timers'
 require '/footer'
+time = require '/time'
 
 ## Synchronize on connect/reconnect ##
 
-ss.server.on 'ready', ->
+ss.server.on 'connect', ->
   jQuery ->
     ss.rpc('server.status')
-
-ss.server.on 'connect', ->
-  ss.rpc('server.status')
-
-ss.server.on 'reconnect', ->
-  ss.rpc('server.status')
+    time.sync()
 
 ## Logging ##
 
